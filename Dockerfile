@@ -11,12 +11,15 @@ LABEL org.label-schema.vcs-url="https://github.com/metabrainz/listenbrainz-serve
       org.label-schema.name="ListenBrainz" \
       org.metabrainz.based-on-image="metabrainz/python:$PYTHON_BASE_IMAGE_VERSION"
 
-ENV DOCKERIZE_VERSION=v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+ENV DOCKERIZE_VERSION=v0.8.0
+RUN ARCH=$(dpkg --print-architecture) \
+    && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz
 
 ENV SENTRY_CLI_VERSION=1.63.1
-RUN wget -O /usr/local/bin/sentry-cli https://downloads.sentry-cdn.com/sentry-cli/$SENTRY_CLI_VERSION/sentry-cli-Linux-x86_64 \
+RUN ARCH=$(uname -m) \
+    && wget -O /usr/local/bin/sentry-cli https://downloads.sentry-cdn.com/sentry-cli/$SENTRY_CLI_VERSION/sentry-cli-Linux-${ARCH} \
     && chmod +x /usr/local/bin/sentry-cli
 
 ENV SENTRY_SERVICE_ERROR_ENVIRONMENT=listenbrainz
