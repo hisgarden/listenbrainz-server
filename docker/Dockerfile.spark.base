@@ -19,20 +19,23 @@ RUN apt-get update \
     libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+ENV DOCKERIZE_VERSION v0.8.0
+RUN ARCH=$(dpkg --print-architecture) \
+    && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-${ARCH}-$DOCKERIZE_VERSION.tar.gz
 
 WORKDIR /usr/local
 
 ENV JAVA_VERSION 11.0.26
 ENV JAVA_MAJOR_VERSION 11
 ENV JAVA_BUILD_VERSION 4
-RUN wget https://github.com/adoptium/temurin${JAVA_MAJOR_VERSION}-binaries/releases/download/jdk-${JAVA_VERSION}%2B${JAVA_BUILD_VERSION}/OpenJDK${JAVA_MAJOR_VERSION}U-jdk_x64_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz \
-    && tar xzf OpenJDK${JAVA_MAJOR_VERSION}U-jdk_x64_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz \
+RUN ARCH=$(uname -m) \
+    && if [ "$ARCH" = "aarch64" ]; then JDK_ARCH="aarch64"; else JDK_ARCH="x64"; fi \
+    && wget https://github.com/adoptium/temurin${JAVA_MAJOR_VERSION}-binaries/releases/download/jdk-${JAVA_VERSION}%2B${JAVA_BUILD_VERSION}/OpenJDK${JAVA_MAJOR_VERSION}U-jdk_${JDK_ARCH}_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz \
+    && tar xzf OpenJDK${JAVA_MAJOR_VERSION}U-jdk_${JDK_ARCH}_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz \
     && mv jdk-${JAVA_VERSION}+${JAVA_BUILD_VERSION} /usr/local/jdk \
-    && rm OpenJDK${JAVA_MAJOR_VERSION}U-jdk_x64_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz
+    && rm OpenJDK${JAVA_MAJOR_VERSION}U-jdk_${JDK_ARCH}_linux_hotspot_${JAVA_VERSION}_${JAVA_BUILD_VERSION}.tar.gz
 ENV JAVA_HOME /usr/local/jdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
