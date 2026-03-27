@@ -5,7 +5,7 @@
 services:
 
   lb_db:
-    image: timescale/timescaledb:latest-pg14
+    image: timescale/timescaledb:2.17.2-pg14
     command: postgres -F
     environment:
       POSTGRES_PASSWORD: 'postgres'
@@ -19,10 +19,10 @@ services:
       - ./couchdb_test.ini:/opt/couchdb/etc/local.ini
 
   redis:
-    image: redis:6.2.2
+    image: valkey/valkey:8.1
 
   rabbitmq:
-    image: rabbitmq:3.8.16
+    image: cloudamqp/lavinmq:latest
 
   listenbrainz:
     build:
